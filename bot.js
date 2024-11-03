@@ -1,6 +1,7 @@
 const { Client, LocalAuth } = require('whatsapp-web.js');
 const qrcode = require('qrcode-terminal');
 const qrcodeLib = require('qrcode');
+const puppeteer = require('puppeteer');  // Adiciona o Puppeteer
 const winston = require('winston');
 const express = require('express');
 const fs = require('fs');
@@ -39,6 +40,13 @@ const blockedNumbers = ["5582981452814@c.us", "5582987616759@c.us", "55828145281
 function isBlockedNumber(contactId) {
     return blockedNumbers.includes(contactId);
 }
+
+// Inicialização do Puppeteer com as opções para ambiente de hospedagem
+(async () => {
+    const browser = await puppeteer.launch({
+        args: ['--no-sandbox', '--disable-setuid-sandbox'],
+    });
+})();
 
 // Configuração do cliente
 const client = new Client({ authStrategy: new LocalAuth() });
