@@ -3,6 +3,7 @@
     "express": "^4.21.1",
     "moment-timezone": "^0.5.45",
     "no": "0.0.1",
+    "puppeteer": "^22.15.0",
     "qrcode": "^1.5.4",
     "qrcode-terminal": "^0.12.0",
     "terminal": "^0.1.4",

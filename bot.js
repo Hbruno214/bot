@@ -1,7 +1,6 @@
 const { Client, LocalAuth } = require('whatsapp-web.js');
 const qrcode = require('qrcode-terminal');
 const qrcodeLib = require('qrcode');
-const puppeteer = require('puppeteer');  // Adiciona o Puppeteer
 const winston = require('winston');
 const express = require('express');
 const fs = require('fs');
@@ -41,14 +40,7 @@ function isBlockedNumber(contactId) {
     return blockedNumbers.includes(contactId);
 }
 
-// Inicialização do Puppeteer com as opções para ambiente de hospedagem
-(async () => {
-    const browser = await puppeteer.launch({
-        args: ['--no-sandbox', '--disable-setuid-sandbox'],
-    });
-})();
-
-// Configuração do cliente
+// Configuração do cliente WhatsApp
 const client = new Client({ authStrategy: new LocalAuth() });
 
 // Geração do QR Code
@@ -88,7 +80,7 @@ client.on('message', async (msg) => {
     // Verificar se o número está bloqueado
     if (isBlockedNumber(contactId)) {
         console.log(`Mensagem ignorada de número bloqueado: ${contactId}`);
-        return; // Ignora a mensagem
+        return;
     }
 
     // Estado de digitação para o usuário
@@ -127,5 +119,5 @@ client.on('message', async (msg) => {
     }
 });
 
-// Inicializa o cliente
+// Inicializa o cliente WhatsApp
 client.initialize();
