@@ -6,10 +6,23 @@ const express = require('express');
 const fs = require('fs');
 const moment = require('moment-timezone');
 
-const blockedNumbers = ["5582981452814@c.us", "5582987616759@c.us", "558281452814@c.us"]; // Lista de números bloqueados
+const blockedNumbers = [
+    "5582981452814@c.us",
+    "5582987616759@c.us",
+    "558281452814@c.us",
+    "5582991933260@c.us",
+    "5582991936737@c.us",
+    "5582993065918@c.us",
+    "5582993680281@c.us",
+    "5582998418408@c.us"
+]; // Lista de números bloqueados
 
 function isBlockedNumber(contactId) {
-    return blockedNumbers.includes(contactId);
+    const isBlocked = blockedNumbers.includes(contactId);
+    if (isBlocked) {
+        console.log(`Número bloqueado detectado: ${contactId}`);
+    }
+    return isBlocked;
 }
 
 const uploadDir = './uploads';
