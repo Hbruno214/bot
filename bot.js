@@ -101,10 +101,46 @@ client.on('message', async (msg) => {
         return;
     }
 
+    // Tratamento principal de mensagens e arquivos
+    if (msg.hasMedia) {
+        // O cliente enviou um arquivo sem interagir com o menu ou palavras-chave
+        const media = await msg.downloadMedia();
+        const fileType = media.mimetype.split('/')[1];
+        if (['pdf', 'jpeg', 'png', 'doc', 'docx'].includes(fileType)) {
+            const filePath = `${uploadDir}/${moment().format('YYYYMMDD_HHmmss')}.${fileType}`;
+            fs.writeFileSync(filePath, media.data, 'base64');
+
+            await client.sendMessage(
+                msg.from,
+                `📥 *Arquivo recebido para impressão.*\nSeu pedido estará pronto em *1 minuto*.`
+            );
+            await client.sendMessage(
+                msg.from,
+                `💳 *Para pagamento, use a chave Pix: 82987616759.*`
+            );
+            await client.sendMessage(
+                msg.from,
+                `🙏 *Obrigado por escolher a Papelaria BH! Caso precise de algo mais, digite "menu".*`
+            );
+            return; // Encerrar aqui porque o arquivo já foi tratado
+        } else {
+            await client.sendMessage(
+                msg.from,
+                '⚠️ *Formato inválido.* Aceitamos apenas *PDF, imagens e documentos do Word (DOC/DOCX).*'
+            );
+            return;
+        }
+    }
+
+    // Tratamento de mensagens de texto
     switch (message) {
         case 'oi':
         case 'olá':
+        case 'ola':
         case 'menu':
+        case 'bom dia':
+        case 'boa tarde':
+        case 'boa noite':
             await client.sendMessage(msg.from, cumprimentar(name));
             await client.sendMessage(msg.from, menuPrincipal());
             break;
@@ -143,26 +179,7 @@ client.on('message', async (msg) => {
             break;
 
         default:
-            if (waitingForFile && userForFile === msg.from && msg.hasMedia) {
-                const media = await msg.downloadMedia();
-                const fileType = media.mimetype.split('/')[1];
-                if (['pdf', 'jpeg', 'png', 'doc', 'docx'].includes(fileType)) {
-                    const filePath = `${uploadDir}/${moment().format('YYYYMMDD_HHmmss')}.${fileType}`;
-                    fs.writeFileSync(filePath, media.data, 'base64');
-                    await client.sendMessage(msg.from, '📥 *Arquivo recebido.* Estamos processando seu pedido...');
-                    if (message === '1' || message === '3') {
-                        await client.sendMessage(msg.from, '✅ *Seu arquivo foi processado com sucesso.*');
-                        await client.sendMessage(msg.from, `💳 *Para pagamento, use a chave Pix: 82987616759.*`);
-                        await client.sendMessage(msg.from, '🙏 *Obrigado por escolher a Papelaria BH! Envie seu feedback para nos ajudar a melhorar.*');
-                    }
-                } else {
-                    await client.sendMessage(msg.from, '⚠️ *Formato inválido.* Aceitamos apenas *PDF, imagens e DOC*.');
-                }
-                waitingForFile = false;
-                userForFile = null;
-            } else {
-                await client.sendMessage(msg.from, '❓ *Opção inválida.* Digite "menu" para ver as opções disponíveis.');
-            }
+            await client.sendMessage(msg.from, '❓ *Opção inválida.* Digite "menu" ou alguma saudação para ver as opções disponíveis.');
             break;
     }
 });
